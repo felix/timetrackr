@@ -1,0 +1,58 @@
+# timetrackr
+
+A simple CLI time tracking utility.
+
+## Contributing to timetrackr
+
+* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
+* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
+* Fork the project
+* Start a feature/bugfix branch
+* Commit and push until you are happy with your contribution
+* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
+* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+
+# commands
+
+## timetracker start [task]
+
+- Start a new task 'task' at this time
+- (config) If another task is already running, make 'task' a subtask of that
+- (config) Stop all other tasks and start 'task'
+
+## tt switch [task]
+
+- Stop all other tasks and start 'task'
+
+## tt stop [task]
+
+- Stop 'task' if provided
+- Stop all tasks if no 'task'
+
+## tt list
+
+- List tasks
+
+## tt export [task]
+
+- Export 'task'
+- Export all tasks if no 'task'
+
+
+## tt del [task]
+
+- Delete 'task'
+
+## tt query [task] [from date] [until date] [in hours|days|weeks] [by day|week|month]
+
+- Produce report of time spent for 'task'
+- Use task 'all' for global report
+
+    tt query all from 2011-05-03 in hours by week
+
+## Copyright
+
+Copyright (c) 2011 Felix Hanley. See LICENSE.txt for
+further details.
+
+>  vim: set ts=4 sw=2 tw=80 ft=markdown fdm=syntax et fen :

@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
+
+require 'timetrackr'
+
+def help
+  puts "Help!"
+end
+
+config = {}
+config_file = File.join(ENV['HOME'],'.timetrackrrc')
+if File.exist?(config_file)
+  require 'yaml'
+  config = YAML.load_file(config_file)
+end
+
+# global options
+while (cmd = ARGV.shift) && cmd.start_with?('-')
+  if ['-v','--verbose'].include? cmd
+    config[:verbose] = true
+  end
+  if ['-h','--help'].include? cmd
+    help
+  end
+end
+
+if config[:verbose]
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+  puts "timetrackr version #{version}"
+end
+
+
+trackr = TimeTrackr.new(config)
+case cmd
+when 'start','s'
+  trackr.start(ARGV)
+
+when 'stop','k'
+  trackr.stop(ARGV)
+
+when 'status','current'
+  trackr.current
+
+when 'switch','sw'
+  trackr.switch(ARGV)
+
+when 'time'
+  puts trackr.time(ARGV[0])
+
+when 'clear'
+  trackr.clear(ARGV[0])
+
+else
+  help
+end
+trackr.exit
+
+#  vim: set ts=2 sw=2 tw=80 ft=ruby fdm=syntax et fen :

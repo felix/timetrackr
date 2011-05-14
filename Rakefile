@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "timetrackr"
   gem.homepage = "http://github.com/felix/timetrackr"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = "A simple time tracking utility"
+  gem.description = "A simple time tracking utility"
   gem.email = "felix@seconddrawer.com.au"
   gem.authors = ["felix"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,

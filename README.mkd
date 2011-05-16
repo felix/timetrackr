@@ -15,7 +15,7 @@ A simple CLI time tracking utility.
     >tt clear work
 
     >tt time
-    play *                          0h  0m  1s
+    play *                          0h  0m  5s
 
 
 

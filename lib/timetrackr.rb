@@ -34,6 +34,20 @@ class TimeTrackr
   end
 
   #
+  # start a period
+  #
+  def start(task,notes)
+    raise 'Not implemented'
+  end
+
+  #
+  # stop a period
+  #
+  def stop(task)
+    raise 'Not implemented'
+  end
+
+  #
   # return an array of all tasks
   #
   def tasks
@@ -42,21 +56,19 @@ class TimeTrackr
 
   #
   # time in task in seconds
-  # only considers 'start' and 'stop' events
   #
   def time(task)
+  end
+
+  #
+  # get task history as an array of Periods
+  #
+  def history(task)
     raise 'Not Implemented'
   end
 
   #
-  # write an event
-  #
-  def event(task, time=Time.now, details={})
-    raise 'Not Implemented'
-  end
-
-  #
-  # clear an event
+  # clear an task
   #
   def clear(task)
     raise 'Not Implemented'

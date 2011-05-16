@@ -3,13 +3,16 @@
 $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 
 require 'timetrackr'
+require 'timetrackr/period'
 
 DEFAULTS = {
   :backend => 'yaml',
   :verbose => false,
   :single_task => false,
   :path => File.join(ENV['HOME'],'.timetrackr.db'),
-  :time_format => "% -30<task>s %2<hours>dh %2<minutes>dm %2<seconds>ds"
+  :relative_format => "%2<hours>dh %2<minutes>dm %2<seconds>ds",
+  :absolute_time => "%H:%m",
+  :absolute_day => "%Y-%m-%d"
 }
 
 def show_help
@@ -32,12 +35,11 @@ def show_help
 HELP
 end
 
-def format_time(task, time, fmt_str)
+def format_time(time, fmt_str)
   hours = time.to_i/3600.to_i
   minutes = (time/60 - hours * 60).to_i
   seconds = (time - (minutes * 60 + hours * 3600))
   format(fmt_str,{
-    :task => task,
     :hours => hours,
     :minutes => minutes,
     :seconds => seconds})
@@ -71,37 +73,36 @@ trackr = TimeTrackr.create(config[:backend], config)
 case cmd
 when 'start','in','s'
   task = ARGV.shift
-  details = {:action => 'start', :notes => ARGV.join(' ')}
+  notes = ARGV.join(' ')
   # switch tasks if config says so
   if config[:single_task] && trackr.current != task
-    trackr.current.each do |t|
-      trackr.event(t,Time.now,details.merge(:action => 'stop')) unless t == task
-    end
-    trackr.event(task,Time.now,details)
+    trackr.current.each { |t|
+      trackr.stop(t) unless t == task
+    }
     puts "Switched to task '#{task}'" if $verbose
   else
-    trackr.event(task,Time.now, details)
     puts "Started task '#{task}'" if $verbose
   end
+  trackr.start(task, notes)
 
 when 'stop','out','kill','k'
-  task = ARGV.shift
-  tasks = []
-  details = {:action => 'stop', :notes => ARGV.join(' ')}
-  tasks = [*task] if trackr.current.include?(task)
-  tasks = trackr.tasks if task == 'all'
+  if ARGV[0] == 'all' || ARGV[0].nil?
+    tasks = trackr.tasks
+  else
+    tasks = ARGV
+  end
   tasks.each do |task|
-    trackr.event(task, Time.now, details)
+    trackr.stop(task)
     puts "Stopped task '#{task}'" if $verbose
   end
 
 when 'switch','sw'
   task = ARGV.shift
-  details = {:notes => ARGV.join(' ')}
+  notes = ARGV.join(' ')
   trackr.current.each do |t|
-    trackr.event(t, Time.now, details.merge(:action => 'stop')) unless t == task
+    trackr.stop(t) unless t == task
   end
-  trackr.event(task, Time.now, details.merge(:action => 'start'))
+  trackr.start(task, notes)
   puts "Switched to task '#{task}'" if $verbose
 
 when 'time','status',nil
@@ -112,9 +113,34 @@ when 'time','status',nil
     tasks = trackr.tasks.each
   end
   tasks.each do |task|
+    total = trackr.history(task).reduce(0){ |t, period|
+      t = t + period.length
+    }
     name = trackr.current.include?(task) ? task+' *' : task
-    puts format_time(name, trackr.time(task),config[:time_format])
+    puts name.ljust(15) << format_time(total,config[:relative_format])
   end
+
+when 'log'
+  if ARGV[0] == 'all' || ARGV[0].nil?
+    tasks = trackr.tasks
+  else
+    tasks = ARGV
+  end
+  table = []
+  periods = tasks.each.collect{ |t| trackr.history(t) }.flatten
+  lastday = nil
+  table << periods.sort{|x,y| x.start <=> y.start}.collect{ |period|
+    currday = period.start.strftime(config[:absolute_day])
+    day = (currday == lastday) ? ' ' : currday
+    lastday = currday
+    name = period.current? ? period.task+' *' : period.task
+    start = period.start.strftime(config[:absolute_time])
+    stop = period.current? ? ' ' : period.stop.strftime(config[:absolute_time])
+    length = format_time(period.length, config[:relative_format])
+    "#{day.ljust(12)} #{name.ljust(15)} #{start.ljust(7)} #{stop.ljust(7)} #{length}"
+  }
+  puts table.join("\n")
+
 
 when 'clear','delete','del'
   tasks = ARGV

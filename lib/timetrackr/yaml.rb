@@ -1,3 +1,15 @@
+#
+# keeps the following format in a yaml file:
+#
+# :current: []
+#
+# :tasks:
+#   foo:
+#   - :start: 2011-05-16 14:26:26.263449 +07:00
+#     :stop: 2011-05-16 14:26:27 +07:00
+#     :notes: "blah blah blah"
+#
+
 class YamlTimeTrackr < TimeTrackr
 
   def initialize(path)
@@ -18,33 +30,25 @@ class YamlTimeTrackr < TimeTrackr
     @db[:tasks].keys.compact.uniq || []
   end
 
-  def time(task)
-    total = 0 # seconds
-    split = nil
-    @db[:tasks][task].sort{|x,y| x[:time] <=> y[:time]}.each do |event|
-      if event[:action] == 'start'
-        split = event[:time]
-      end
-      if split && (event[:action] == 'stop')
-        total = total + (event[:time] - split)
-        split = nil
-      end
+  def start(task, notes)
+    @db[:tasks][task] = Array[] unless @db[:tasks][task]
+    if !@db[:current].include?(task)
+      @db[:current].unshift(task)
+      @db[:tasks][task].push({:start => Time.now, :notes => notes})
     end
-    total = (total + (Time.now - split)) if split
-    total.to_i
   end
 
-  def event(task='default', time=Time.now, details={})
-    details[:action] ||= 'start'
-    details[:time] = time
-    if details[:action].to_s == 'stop' && @db[:current].delete(task)
-      write_event(task,details)
+  def stop(task)
+    if @db[:current].include?(task)
+      @db[:current].delete(task)
+      @db[:tasks][task].last[:stop] = Time.now
     end
+  end
 
-    if details[:action].to_s == 'start' && !@db[:current].include?(task)
-      @db[:current].unshift(task)
-      write_event(task,details)
-    end
+  def history(task, p_begin=nil, p_end=nil)
+    @db[:tasks][task].sort{|x,y| x[:start] <=> y[:start]}.collect {|p|
+      Period.new(task,p[:start],p[:stop],p[:notes])
+    } unless !@db[:tasks].include? task
   end
 
   def close
@@ -57,15 +61,6 @@ class YamlTimeTrackr < TimeTrackr
   end
 
   private
-
-  def write_event(task, details)
-    @db[:tasks] = {} unless @db[:tasks]
-    if @db[:tasks][task]
-      @db[:tasks][task].push(details)
-    else
-      @db[:tasks][task] = Array[details]
-    end
-  end
 
   def write_file
     File.open(@log_path,'w') do |fh|

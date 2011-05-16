@@ -8,6 +8,7 @@ DEFAULTS = {
   :backend => 'yaml',
   :verbose => false,
   :single_task => false,
+  :path => File.join(ENV['HOME'],'.timetrackr.db'),
   :time_format => "% -30<task>s %2<hours>dh %2<minutes>dm %2<seconds>ds"
 }
 
@@ -62,15 +63,16 @@ end
 
 config = DEFAULTS.merge(config || {})
 $verbose = config[:verbose]
-trackr = TimeTracker.create(config[:backend])
+trackr = TimeTrackr.create(config[:backend], config)
 
 # 
 # commands
 #
 case cmd
-when 'start','s'
+when 'start','in','s'
   task = ARGV.shift
   details = {:action => 'start', :notes => ARGV.join(' ')}
+  # switch tasks if config says so
   if config[:single_task] && trackr.current != task
     trackr.current.each do |t|
       trackr.event(t,Time.now,details.merge(:action => 'stop')) unless t == task
@@ -82,7 +84,7 @@ when 'start','s'
     puts "Started task '#{task}'" if $verbose
   end
 
-when 'stop','k'
+when 'stop','out','kill','k'
   task = ARGV.shift
   tasks = []
   details = {:action => 'stop', :notes => ARGV.join(' ')}
@@ -102,7 +104,7 @@ when 'switch','sw'
   trackr.event(task, Time.now, details.merge(:action => 'start'))
   puts "Switched to task '#{task}'" if $verbose
 
-when 'time', nil
+when 'time','status',nil
   task = ARGV.shift
   if task && trackr.tasks.include?(task)
     tasks = [*task]
@@ -114,10 +116,8 @@ when 'time', nil
     puts format_time(name, trackr.time(task),config[:time_format])
   end
 
-when 'clear'
-  task = ARGV.shift
-  tasks = []
-  tasks = [*task] if trackr.current.include?(task)
+when 'clear','delete','del'
+  tasks = ARGV
   tasks = trackr.tasks if task == 'all'
   tasks.each do |task|
     trackr.clear(task)

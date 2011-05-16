@@ -1,13 +1,13 @@
-autoload 'YamlTimeTracker', 'timetrackr/yaml'
-autoload 'SqliteTimeTracker', 'timetrackr/sqlite'
+autoload 'YamlTimeTrackr', 'timetrackr/yaml'
+autoload 'SqliteTimeTrackr', 'timetrackr/sqlite'
 
-class TimeTracker
+class TimeTrackr
   def self.create(type,options={})
     case type.to_s
     when 'yaml'
       begin
         require 'yaml'
-        log = YamlTimeTracker.new(options)
+        log = YamlTimeTrackr.new(options[:path])
         puts 'Loaded yaml tracker' if $verbose
       rescue LoadError
         puts 'Yaml not found'
@@ -15,7 +15,7 @@ class TimeTracker
     when 'sqlite'
       begin
         require 'sqlite3'
-        log = SqliteTimeTracker.new(options)
+        log = SqliteTimeTrackr.new(options[:path])
         puts 'Loaded sqlite tracker' if $verbose
       rescue LoadError
         puts 'Sqlite not found'

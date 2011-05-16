@@ -1,12 +1,12 @@
-class YamlTimeTracker < TimeTracker
+class YamlTimeTrackr < TimeTrackr
 
-  def initialize(options)
-    @log_path = options[:log_path] || File.join(ENV['HOME'],'.timetrackr.db')
-    if File.exist? @log_path
-      @db = YAML.load_file(@log_path)
-    else
+  def initialize(path)
+    @log_path = path
+    if !File.exist? @log_path
       @db = {:current => [], :tasks => {}}
+      write_file
     end
+    @db = YAML.load_file(@log_path)
     puts "Using log file '#{@log_path}'" if $verbose
   end
 
@@ -48,9 +48,7 @@ class YamlTimeTracker < TimeTracker
   end
 
   def close
-    File.open(@log_path,'w') do |fh|
-      YAML.dump(@db,fh)
-    end
+    write_file
   end
 
   def clear(task)
@@ -66,6 +64,12 @@ class YamlTimeTracker < TimeTracker
       @db[:tasks][task].push(details)
     else
       @db[:tasks][task] = Array[details]
+    end
+  end
+
+  def write_file
+    File.open(@log_path,'w') do |fh|
+      YAML.dump(@db,fh)
     end
   end
 end

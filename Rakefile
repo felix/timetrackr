@@ -18,7 +18,7 @@ Jeweler::Tasks.new do |gem|
   gem.summary = "A simple time tracking utility"
   gem.description = "A simple time tracking utility"
   gem.email = "felix@seconddrawer.com.au"
-  gem.authors = ["felix"]
+  gem.authors = ["Felix Hanley"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
   #  gem.add_runtime_dependency 'jabber4r', '> 0.1'

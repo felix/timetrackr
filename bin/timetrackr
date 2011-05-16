@@ -4,8 +4,42 @@ $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 
 require 'timetrackr'
 
-def help
-  puts "Help!"
+DEFAULTS = {
+  :backend => 'yaml',
+  :verbose => false,
+  :single_task => false,
+  :time_format => "% -30<task>s %2<hours>dh %2<minutes>dm %2<seconds>ds"
+}
+
+def show_help
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+  puts "timetrackr version #{version}"
+  puts <<HELP
+
+  timetrackr [command] [options]
+
+  Available commands:
+
+      start [task]   start a task (default is 'default')
+      stop TASK      stop a task ('all' for all)
+      switch TASK    switch tasks
+      time [task]    show time for a task ('all' for all)
+
+  Global options
+      -h --help      show this help
+      -v --verbose   be noisy
+HELP
+end
+
+def format_time(task, time, fmt_str)
+  hours = time.to_i/3600.to_i
+  minutes = (time/60 - hours * 60).to_i
+  seconds = (time - (minutes * 60 + hours * 3600))
+  format(fmt_str,{
+    :task => task,
+    :hours => hours,
+    :minutes => minutes,
+    :seconds => seconds})
 end
 
 config = {}
@@ -21,39 +55,80 @@ while (cmd = ARGV.shift) && cmd.start_with?('-')
     config[:verbose] = true
   end
   if ['-h','--help'].include? cmd
-    help
+    show_help
+    exit 1
   end
 end
 
-if config[:verbose]
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-  puts "timetrackr version #{version}"
-end
+config = DEFAULTS.merge(config || {})
+$verbose = config[:verbose]
+trackr = TimeTracker.create(config[:backend])
 
-
-trackr = TimeTrackr.new(config)
+# 
+# commands
+#
 case cmd
 when 'start','s'
-  trackr.start(ARGV)
+  task = ARGV.shift
+  details = {:action => 'start', :notes => ARGV.join(' ')}
+  if config[:single_task] && trackr.current != task
+    trackr.current.each do |t|
+      trackr.event(t,Time.now,details.merge(:action => 'stop')) unless t == task
+    end
+    trackr.event(task,Time.now,details)
+    puts "Switched to task '#{task}'" if $verbose
+  else
+    trackr.event(task,Time.now, details)
+    puts "Started task '#{task}'" if $verbose
+  end
 
 when 'stop','k'
-  trackr.stop(ARGV)
-
-when 'status','current'
-  trackr.current
+  task = ARGV.shift
+  tasks = []
+  details = {:action => 'stop', :notes => ARGV.join(' ')}
+  tasks = [*task] if trackr.current.include?(task)
+  tasks = trackr.tasks if task == 'all'
+  tasks.each do |task|
+    trackr.event(task, Time.now, details)
+    puts "Stopped task '#{task}'" if $verbose
+  end
 
 when 'switch','sw'
-  trackr.switch(ARGV)
+  task = ARGV.shift
+  details = {:notes => ARGV.join(' ')}
+  trackr.current.each do |t|
+    trackr.event(t, Time.now, details.merge(:action => 'stop')) unless t == task
+  end
+  trackr.event(task, Time.now, details.merge(:action => 'start'))
+  puts "Switched to task '#{task}'" if $verbose
 
-when 'time'
-  puts trackr.time(ARGV[0])
+when 'time', nil
+  task = ARGV.shift
+  if task && trackr.tasks.include?(task)
+    tasks = [*task]
+  else
+    tasks = trackr.tasks.each
+  end
+  tasks.each do |task|
+    name = trackr.current.include?(task) ? task+' *' : task
+    puts format_time(name, trackr.time(task),config[:time_format])
+  end
 
 when 'clear'
-  trackr.clear(ARGV[0])
+  task = ARGV.shift
+  tasks = []
+  tasks = [*task] if trackr.current.include?(task)
+  tasks = trackr.tasks if task == 'all'
+  tasks.each do |task|
+    trackr.clear(task)
+    puts "Task '#{task}' cleared" if $verbose
+  end
 
 else
-  help
+  puts "'#{cmd}' is not a valid command"
+  show_help
 end
-trackr.exit
+
+trackr.close
 
 #  vim: set ts=2 sw=2 tw=80 ft=ruby fdm=syntax et fen :

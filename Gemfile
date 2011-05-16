@@ -1,8 +1,5 @@
 source 'http://rubygems.org'
 
-gem 'trollop'
-gem 'sqlite3'
-
 group :development do
   gem 'shoulda', '>= 0'
   gem 'bundler', '~> 1.0.0'

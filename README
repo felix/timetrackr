@@ -16,11 +16,10 @@ A simple CLI time tracking utility.
 
 ## timetracker start [task]
 
-- Start a new task 'task' at this time
-- (config) If another task is already running, make 'task' a subtask of that
+- Start a new task 'task' at this time, 'default' if name not provided
 - (config) Stop all other tasks and start 'task'
 
-## tt switch [task]
+## tt switch <task>
 
 - Stop all other tasks and start 'task'
 
@@ -29,30 +28,15 @@ A simple CLI time tracking utility.
 - Stop 'task' if provided
 - Stop all tasks if no 'task'
 
-## tt list
+## tt time
 
-- List tasks
+- List tasks and their times
 
-## tt export [task]
+## tt clear [task]
 
-- Export 'task'
-- Export all tasks if no 'task'
-
-
-## tt del [task]
-
-- Delete 'task'
-
-## tt query [task] [from date] [until date] [in hours|days|weeks] [by day|week|month]
-
-- Produce report of time spent for 'task'
-- Use task 'all' for global report
-
-    tt query all from 2011-05-03 in hours by week
+- Delete 'task' or 'all'
 
 ## Copyright
 
 Copyright (c) 2011 Felix Hanley. See LICENSE.txt for
 further details.
-
->  vim: set ts=4 sw=2 tw=80 ft=markdown fdm=syntax et fen :

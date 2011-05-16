@@ -1,65 +1,72 @@
-require 'timetrackr/eventlog'
+autoload 'YamlTimeTracker', 'timetrackr/yaml'
+autoload 'SqliteTimeTracker', 'timetrackr/sqlite'
 
-DEFAULTS = {
-  :backend => 'yaml',
-  :single_task => false,
-  :time_format => "%02dh %02dm %02ds"
-}
-
-class TimeTrackr
-
-  def initialize(config)
-    @config = DEFAULTS.merge(config || {})
-    $verbose = @config[:verbose]
-    @log = EventLog.create(@config[:backend])
-  end
-
-  def start(args=[])
-    return switch(args) if @config[:single_task] && @log.current
-
-    task = args.shift
-    notes = args.join(' ')
-    puts "Starting task '#{task}'" if $verbose
-    @log.event(Time.now, 'start', task, notes)
-  end
-
-  def stop(args=[])
-    task = args.shift
-    if @log.current.include? task
-      notes = args.join(' ')
-      puts "Stopping task '#{task}'" if $verbose
-      @log.event(Time.now, 'stop', task, notes)
+class TimeTracker
+  def self.create(type,options={})
+    case type.to_s
+    when 'yaml'
+      begin
+        require 'yaml'
+        log = YamlTimeTracker.new(options)
+        puts 'Loaded yaml tracker' if $verbose
+      rescue LoadError
+        puts 'Yaml not found'
+      end
+    when 'sqlite'
+      begin
+        require 'sqlite3'
+        log = SqliteTimeTracker.new(options)
+        puts 'Loaded sqlite tracker' if $verbose
+      rescue LoadError
+        puts 'Sqlite not found'
+      end
+    else
+      raise "Bad log type: #{type}"
     end
+    log
   end
 
-  def switch(args=[])
-    task = args.shift
-    notes = args.join(' ')
-    puts "Switching to task '#{task}'" if $verbose
-    @log.current.each do |t|
-      @log.event(Time.now,'stop',t, notes) unless t == task
-    end
-    @log.event(Time.now,'start',task, notes)
-  end
-
-  def time(task)
-    time = @log.time(task).to_i
-    hours = time/3600.to_i
-    minutes = (time/60 - hours * 60).to_i
-    seconds = (time - (minutes * 60 + hours * 3600))
-    format(@config[:time_format], hours, minutes, seconds)
-  end
-
-  def clear(task)
-    puts "Clearing task '#{task}'" if $verbose
-    @log.clear(task)
-  end
-
+  #
+  # return an array of current tasks
+  #
   def current
-    puts @log.current.inspect
+    raise 'Not Implemented'
   end
 
-  def exit
-    @log.close
+  #
+  # return an array of all tasks
+  #
+  def tasks
+    raise 'Not Implemented'
   end
+
+  #
+  # time in task in seconds
+  # only considers 'start' and 'stop' events
+  #
+  def time(task)
+    raise 'Not Implemented'
+  end
+
+  #
+  # write an event
+  #
+  def event(task, time=Time.now, details={})
+    raise 'Not Implemented'
+  end
+
+  #
+  # clear an event
+  #
+  def clear(task)
+    raise 'Not Implemented'
+  end
+
+  #
+  # cleanup and close
+  #
+  def close
+  end
+
 end
+

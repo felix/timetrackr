@@ -66,11 +66,6 @@ class TestTimetrackr < Test::Unit::TestCase
     end
 
     context 'with empty db' do
-      setup do
-        File.open(@config[:path]) do |fh|
-          @db = YAML.load(fh)
-        end
-      end
 
       should 'not fail on current command' do
         assert_nothing_raised Exception do

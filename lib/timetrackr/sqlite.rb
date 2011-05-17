@@ -5,11 +5,11 @@ class SqliteTimeTrackr < TimeTrackr
     if !File.exist? @log_path
       @db = SQLite3::Database.new(@log_path)
       sql_events = "CREATE TABLE events (
-      id INTEGER AUTO_INCREMENT PRIMARY KEY,
-      task VARCHAR(50),
-      start DATETIME,
-      stop DATETIME,
-      notes VARCHAR(255));"
+      id INTEGER PRIMARY KEY,
+      task TEXT,
+      start TIME,
+      stop TIME,
+      notes TEXT);"
       @db.execute(sql_events)
     else
       @db = SQLite3::Database.open(@log_path)
@@ -43,7 +43,7 @@ class SqliteTimeTrackr < TimeTrackr
 
   def stop(task)
     sql = "SELECT id FROM events WHERE task = :task AND stop IS NULL;"
-    exists = @db.get_first_value(sql, 'task' => task).first
+    exists = @db.get_first_value(sql, 'task' => task)
     if exists
       sql = "UPDATE events SET stop = :stop WHERE id = :current;"
       @db.execute(sql, 'current' => exists, 'stop' => Time.now.to_s)

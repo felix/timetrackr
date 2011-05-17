@@ -6,13 +6,13 @@ require 'timetrackr'
 require 'timetrackr/period'
 
 DEFAULTS = {
-  :backend => 'yaml',
-  :verbose => false,
-  :single_task => false,
-  :path => File.join(ENV['HOME'],'.timetrackr.db'),
-  :relative_format => "%2<hours>dh %2<minutes>dm %2<seconds>ds",
-  :absolute_time => "%H:%m",
-  :absolute_day => "%Y-%m-%d"
+  'backend' => 'yaml',
+  'verbose' => false,
+  'single_task' => false,
+  'path' => File.join(ENV['HOME'],'.timetrackr.db'),
+  'relative_format' => "%2<hours>dh %2<minutes>dm %2<seconds>ds",
+  'absolute_time' => "%H:%M",
+  'absolute_day' => "%Y-%m-%d"
 }
 
 def show_help
@@ -56,7 +56,7 @@ end
 # global options
 while (cmd = ARGV.shift) && cmd.start_with?('-')
   if ['-v','--verbose'].include? cmd
-    config[:verbose] = true
+    config['verbose'] = true
   end
   if ['-h','--help'].include? cmd
     show_help
@@ -65,8 +65,8 @@ while (cmd = ARGV.shift) && cmd.start_with?('-')
 end
 
 config = DEFAULTS.merge(config || {})
-$verbose = config[:verbose]
-trackr = TimeTrackr.create(config[:backend], config)
+$verbose = config['verbose']
+trackr = TimeTrackr.create(config['backend'], config)
 
 # 
 # commands
@@ -76,7 +76,7 @@ when 'start','in','s'
   task = ARGV.shift
   notes = ARGV.join(' ')
   # switch tasks if config says so
-  if config[:single_task] && trackr.current != task
+  if config['single_task'] && trackr.current != task
     trackr.current.each { |t|
       trackr.stop(t) unless t == task
     }
@@ -118,7 +118,7 @@ when 'time','status',nil
       t = t + period.length
     }
     name = trackr.current.include?(task) ? task+' *' : task
-    puts name.ljust(15) << format_time(total,config[:relative_format])
+    puts name.ljust(15) << format_time(total,config['relative_format'])
   end
 
 when 'log'
@@ -131,13 +131,13 @@ when 'log'
   periods = tasks.each.collect{ |t| trackr.history(t) }.flatten
   lastday = nil
   table << periods.sort{|x,y| x.start <=> y.start}.collect{ |period|
-    currday = period.start.strftime(config[:absolute_day])
+    currday = period.start.strftime(config['absolute_day'])
     day = (currday == lastday) ? ' ' : currday
     lastday = currday
     name = period.current? ? period.task+' *' : period.task
-    start = period.start.strftime(config[:absolute_time])
-    stop = period.current? ? ' ' : period.stop.strftime(config[:absolute_time])
-    length = format_time(period.length, config[:relative_format])
+    start = period.start.strftime(config['absolute_time'])
+    stop = period.current? ? ' ' : period.stop.strftime(config['absolute_time'])
+    length = format_time(period.length, config['relative_format'])
     "#{day.ljust(12)} #{name.ljust(15)} #{start.ljust(7)} #{stop.ljust(7)} #{length}"
   }
   puts table.join("\n")

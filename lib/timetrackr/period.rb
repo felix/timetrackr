@@ -15,7 +15,7 @@ class Period
   end
 
   def current?
-    stop.nil?
+    @stop.nil?
   end
 
 end

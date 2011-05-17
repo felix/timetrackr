@@ -4,18 +4,22 @@ A simple CLI time tracking utility.
 
 ## Example
 
-    >tt start work
+    $ tt start work
 
-    >tt switch play
+    $ tt switch play
 
-    >tt
+    $ tt
     work                            0h  0m  3s
     play *                          0h  0m  1s
 
-    >tt clear work
+    $ tt clear work
 
-    >tt time
+    $ tt time
     play *                          0h  0m  5s
+
+    $ tt log
+    2011-05-17   work           08:05   08:20    0h 15m 41s
+                 something *    09:05            0h  0m  4s
 
 
 

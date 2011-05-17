@@ -11,7 +11,7 @@ DEFAULTS = {
   :single_task => false,
   :path => File.join(ENV['HOME'],'.timetrackr.db'),
   :relative_format => "%2<hours>dh %2<minutes>dm %2<seconds>ds",
-  :absolute_time => "%H:%m",
+  :absolute_time => "%H:%M",
   :absolute_day => "%Y-%m-%d"
 }
 
@@ -140,7 +140,7 @@ when 'log'
     length = format_time(period.length, config[:relative_format])
     "#{day.ljust(12)} #{name.ljust(15)} #{start.ljust(7)} #{stop.ljust(7)} #{length}"
   }
-  puts table.join("\n")
+  puts table
 
 
 when 'clear','delete','del'

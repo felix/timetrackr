@@ -5,33 +5,35 @@
 
 Gem::Specification.new do |s|
   s.name = %q{timetrackr}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Felix Hanley"]
-  s.date = %q{2011-05-16}
+  s.date = %q{2011-05-17}
   s.default_executable = %q{timetrackr}
   s.description = %q{A simple time tracking utility}
   s.email = %q{felix@seconddrawer.com.au}
   s.executables = ["timetrackr"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README"
+    "README.mkd"
   ]
   s.files = [
     "Gemfile",
+    "Gemfile.lock",
     "LICENSE.txt",
-    "README",
+    "README.mkd",
     "Rakefile",
     "VERSION",
     "bin/timetrackr",
     "lib/timetrackr.rb",
+    "lib/timetrackr/period.rb",
     "lib/timetrackr/yaml.rb",
     "test/helper.rb",
     "test/test_timetrackr.rb",
     "timetrackr.gemspec"
   ]
-  s.homepage = %q{http://felixhanley.info/projects/timetrackr}
+  s.homepage = %q{http://github.com/felix/timetrackr}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}

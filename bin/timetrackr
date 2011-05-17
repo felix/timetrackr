@@ -24,10 +24,11 @@ def show_help
 
   Available commands:
 
-      start [task]   start a task (default is 'default')
-      stop TASK      stop a task ('all' for all)
+      start [task]   start a task
+      stop [task]    stop a task (or 'all')
       switch TASK    switch tasks
-      time [task]    show time for a task ('all' for all)
+      time [task]    show time for a task (or 'all')
+      log [task]     show time log for a task (or 'all')
 
   Global options
       -h --help      show this help

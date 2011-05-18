@@ -1,5 +1,6 @@
 autoload 'YamlTimeTrackr', 'timetrackr/yaml'
 autoload 'SqliteTimeTrackr', 'timetrackr/sqlite'
+autoload 'Period', 'timetrackr/period'
 
 class TimeTrackr
   def self.create(type, options={})

@@ -4,23 +4,24 @@ A simple CLI time tracking utility.
 
 ## Example
 
-    $ tt start work
+(with a Bash alias of 'tt')
 
-    $ tt switch play
+    $ tt start something
 
     $ tt
-    work                            0h  0m  3s
-    play *                          0h  0m  1s
+    something *     0h  0m  4s
 
-    $ tt clear work
-
-    $ tt time
-    play *                          0h  0m  5s
+    $ tt start another-thing
 
     $ tt log
-    2011-05-17   work           08:05   08:20    0h 15m 41s
-                 something *    09:05            0h  0m  4s
+    2011-05-18   something *     22:11            0h  0m 26s
+                 another-thing * 22:11            0h  0m  6s
 
+    $ tt stop something
+
+    $ tt
+    something       0h  0m 37s
+    another-thing * 0h  0m 20s
 
 
 ## Contributing to timetrackr

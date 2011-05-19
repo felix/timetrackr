@@ -57,6 +57,11 @@ class SqliteTimeTrackr < TimeTrackr
     }
   end
 
+  def rename(from, to)
+    sql = "UPDATE events SET task = :to WHERE task = :from;"
+    @db.execute(sql, 'to' => to, 'from' => from)
+  end
+
   def clear(task)
     sql = "DELETE FROM events WHERE task = :task;"
     @db.execute(sql, 'task' => task)

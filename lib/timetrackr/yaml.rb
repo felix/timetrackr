@@ -51,6 +51,13 @@ class YamlTimeTrackr < TimeTrackr
     } unless !@db[:tasks].include? task
   end
 
+  def rename(from, to)
+    @db[:tasks][to] = @db[:tasks].delete(from)
+    if @db[:current].delete(from)
+      @db[:current].unshift(to)
+    end
+  end
+
   def close
     write_file
   end

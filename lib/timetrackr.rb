@@ -69,6 +69,13 @@ class TimeTrackr
   end
 
   #
+  # rename a task
+  #
+  def rename(from, to)
+    raise 'Not implemented'
+  end
+
+  #
   # clear an task
   #
   def clear(task)

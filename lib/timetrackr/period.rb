@@ -9,13 +9,22 @@ class Period
     @notes = notes
   end
 
+  def start
+    @start.class == Time ? @start : Time.parse(@start)
+  end
+
+  def stop
+    return nil if @stop.nil?
+    @stop.class == Time ? @stop : Time.parse(@stop)
+  end
+
   def length
-    stop = @stop || Time.now
-    stop - @start
+    stop = self.stop || Time.now
+    stop - self.start
   end
 
   def current?
-    @stop.nil?
+    self.stop.nil?
   end
 
 end

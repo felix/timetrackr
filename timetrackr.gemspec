@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{timetrackr}
-  s.version = "0.1.4"
+  s.version = "0.1.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Felix Hanley"]
-  s.date = %q{2011-05-19}
+  s.date = %q{2011-05-23}
   s.default_executable = %q{timetrackr}
   s.description = %q{A simple time tracking utility}
   s.email = %q{felix@seconddrawer.com.au}
@@ -27,6 +27,9 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/timetrackr",
     "lib/timetrackr.rb",
+    "lib/timetrackr/cli.rb",
+    "lib/timetrackr/database.rb",
+    "lib/timetrackr/json.rb",
     "lib/timetrackr/period.rb",
     "lib/timetrackr/sqlite.rb",
     "lib/timetrackr/yaml.rb",
@@ -49,12 +52,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<sqlite3>, [">= 0"])
+      s.add_development_dependency(%q<json>, [">= 0"])
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.5.2"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
     else
       s.add_dependency(%q<sqlite3>, [">= 0"])
+      s.add_dependency(%q<json>, [">= 0"])
       s.add_dependency(%q<shoulda>, [">= 0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
@@ -62,6 +67,7 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<sqlite3>, [">= 0"])
+    s.add_dependency(%q<json>, [">= 0"])
     s.add_dependency(%q<shoulda>, [">= 0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.5.2"])

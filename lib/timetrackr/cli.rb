@@ -97,10 +97,13 @@ module TimeTrackr
         end
 
       when 'log'
-        if args[0] == 'all' || args[0].nil?
+        if args[0].nil? || args[0] == 'all'
           tasks = @trackr.tasks
         else
-          tasks = args
+          split = args.index('-n')
+          show = args.slice(0...split).compact.uniq
+          ignore = args.slice(split+1..-1).compact.uniq
+          tasks = @trackr.tasks + show - ignore
         end
         table = []
         periods = tasks.each.collect{ |t| @trackr.history(t) }.flatten

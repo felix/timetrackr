@@ -44,6 +44,7 @@ module TimeTrackr
 
     #
     # run a command on the tracker
+    # 'args' is everything after the command
     #
     def run(cmd,args)
       case cmd
@@ -62,11 +63,7 @@ module TimeTrackr
         @trackr.start(task, notes)
 
       when 'stop','out','kill','k'
-        if args[0] == 'all' || args[0].nil?
-          tasks = @trackr.tasks
-        else
-          tasks = args
-        end
+        tasks = get_tasks(args)
         tasks.each do |task|
           @trackr.stop(task)
           puts "Stopped task '#{task}'" if @verbose
@@ -82,12 +79,7 @@ module TimeTrackr
         puts "Switched to task '#{task}'" if @verbose
 
       when 'time','status',nil
-        task = args.shift
-        if task && @trackr.tasks.include?(task)
-          tasks = [*task]
-        else
-          tasks = @trackr.tasks.each
-        end
+        tasks = get_tasks(args)
         tasks.each do |task|
           total = @trackr.history(task).reduce(0){ |t, period|
             t = t + period.length
@@ -97,15 +89,9 @@ module TimeTrackr
         end
 
       when 'log'
-        if args[0].nil? || args[0] == 'all'
-          tasks = @trackr.tasks
-        else
-          split = args.index('-n')
-          show = args.slice(0...split).compact.uniq
-          ignore = args.slice(split+1..-1).compact.uniq
-          tasks = @trackr.tasks + show - ignore
-        end
+        tasks = get_tasks(args)
         table = []
+        # get all periods for selected tasks
         periods = tasks.each.collect{ |t| @trackr.history(t) }.flatten
         lastday = nil
         table << periods.sort{|x,y| x.start <=> y.start}.collect{ |period|
@@ -121,10 +107,8 @@ module TimeTrackr
         }
         puts table
 
-
       when 'clear','delete','del'
-        tasks = args
-        tasks = @trackr.tasks if task == 'all'
+        tasks = get_tasks(args)
         tasks.each do |task|
           @trackr.clear(task)
           puts "Task '#{task}' cleared" if @verbose
@@ -148,6 +132,18 @@ module TimeTrackr
     end
 
     protected
+
+    def get_tasks(args)
+      if args[0].nil? || args[0] == 'all'
+        tasks = @trackr.tasks
+      else
+        split = args.index('-n')
+        show = args.slice(0...split).compact.uniq
+        ignore = args.slice(split+1..-1).compact.uniq
+        tasks = (show.empty? ? @trackr.tasks : @trackr.tasks & show) - ignore
+      end
+      tasks
+    end
 
     def format_time(time, fmt_str)
       hours = time.to_i/3600.to_i

@@ -134,15 +134,14 @@ module TimeTrackr
     protected
 
     def get_tasks(args)
-      if args[0].nil? || args[0] == 'all'
-        tasks = @trackr.tasks
-      else
-        split = args.index('-n')
-        show = args.slice(0...split).compact.uniq
-        ignore = args.slice(split+1..-1).compact.uniq
-        tasks = (show.empty? ? @trackr.tasks : @trackr.tasks & show) - ignore
+      if args[0].nil? || args[0] == 'all' || args[0] == '-n'
+        args.unshift(@trackr.tasks).flatten!.delete('all')
       end
-      tasks
+
+      split = args.index('-n') || args.length
+      show = args.slice(0...split).compact.uniq
+      ignore =[*args.slice(split+1..-1)].compact.uniq
+      tasks = (show.empty? ? @trackr.tasks : @trackr.tasks & show) - ignore
     end
 
     def format_time(time, fmt_str)

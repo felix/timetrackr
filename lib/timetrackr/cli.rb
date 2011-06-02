@@ -80,32 +80,13 @@ module TimeTrackr
 
       when 'time','status',nil
         tasks = get_tasks(args)
-        tasks.each do |task|
-          total = @trackr.history(task).reduce(0){ |t, period|
-            t = t + period.length
-          }
-          name = @trackr.current.include?(task) ? task+' *' : task
-          puts name.ljust(15) << format_time(total,@config['relative_format'])
-        end
+        puts create_log(tasks,'t')
 
       when 'log'
+        group = args.shift[1] if ['-d','-t'].include?(args[0])
+
         tasks = get_tasks(args)
-        table = []
-        # get all periods for selected tasks
-        periods = tasks.each.collect{ |t| @trackr.history(t) }.flatten
-        lastday = nil
-        table << periods.sort{|x,y| x.start <=> y.start}.collect{ |period|
-          currday = period.start.strftime(@config['absolute_day'])
-          day = (currday == lastday) ? ' ' : currday
-          lastday = currday
-          name = period.current? ? period.task+' *' : period.task
-          start = period.start.strftime(@config['absolute_time'])
-          stop = period.current? ? ' ' : period.stop.strftime(@config['absolute_time'])
-          length = format_time(period.length, @config['relative_format'])
-          notes = period.notes
-          "#{day.ljust(12)} #{name.ljust(15)} #{start} - #{stop.ljust(5)}  #{length}  #{notes}"
-        }
-        puts table
+        puts create_log(tasks,group)
 
       when 'clear','delete','del'
         tasks = get_tasks(args)
@@ -152,6 +133,55 @@ module TimeTrackr
         :hours => hours,
         :minutes => minutes,
         :seconds => seconds})
+    end
+
+    def create_log(tasks,group=nil)
+      totals = Hash.new(0)
+      days = {}
+      table = []
+      # get all periods for selected tasks
+      periods = tasks.each.collect{ |t| @trackr.history(t) }.flatten
+      lastday = nil
+      periods.sort{|x,y| x.start <=> y.start}.collect do |period|
+        currday = period.start.strftime(@config['absolute_day'])
+        if currday == lastday
+          day = ''
+        else
+          day = currday
+          days[day] = Hash.new(0)
+        end
+        lastday = currday
+
+        start = period.start.strftime(@config['absolute_time'])
+        stop = period.current? ? ' ' : period.stop.strftime(@config['absolute_time'])
+        name = period.current? ? period.task+' *' : period.task
+        notes = period.notes
+        length = format_time(period.length, @config['relative_format'])
+
+        totals[period.task] = totals[period.task] + period.length if group == 't'
+        days[currday][period.task] = days[currday][period.task] + period.length if group == 'd'
+        # for full log
+        table << "#{day.ljust(12)} #{name.ljust(15)} #{start} - #{stop.ljust(5)}  #{length}  #{notes}" if group.nil?
+      end
+
+      case group
+      when 't'
+        tasks.each do |task|
+          name = @trackr.current.include?(task) ? task+' *' : task
+          table <<  name.ljust(15) + format_time(totals[task],@config['relative_format'])
+        end
+      when 'd'
+        prev_date = ''
+        days.each_pair do |date,tasks|
+          tasks.each_pair do |task,length|
+            name = @trackr.current.include?(task) ? task+' *' : task
+            date_string = (date == prev_date) ? ' ' : date
+            prev_date = date
+            table << "#{date_string.ljust(12)} #{name.ljust(15)}  " + format_time(length, @config['relative_format'])
+          end
+        end
+      end
+      table
     end
 
     def show_help

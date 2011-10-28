@@ -2,8 +2,10 @@ CHANGELOG
 Gemfile
 Gemfile.lock
 LICENSE
+Manifest
 README
 Rakefile
+TODO
 VERSION
 bin/timetrackr
 lib/timetrackr.rb
@@ -13,4 +15,3 @@ lib/timetrackr/period.rb
 test/helper.rb
 test/test_timetrackr.rb
 timetrackr.gemspec
-Manifest

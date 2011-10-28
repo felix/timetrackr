@@ -6,7 +6,6 @@ Manifest
 README
 Rakefile
 TODO
-VERSION
 bin/timetrackr
 lib/timetrackr.rb
 lib/timetrackr/cli.rb

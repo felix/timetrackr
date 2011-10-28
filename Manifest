@@ -1,0 +1,16 @@
+CHANGELOG
+Gemfile
+Gemfile.lock
+LICENSE
+README
+Rakefile
+VERSION
+bin/timetrackr
+lib/timetrackr.rb
+lib/timetrackr/cli.rb
+lib/timetrackr/database.rb
+lib/timetrackr/period.rb
+test/helper.rb
+test/test_timetrackr.rb
+timetrackr.gemspec
+Manifest

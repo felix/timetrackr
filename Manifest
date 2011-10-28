@@ -14,4 +14,3 @@ lib/timetrackr/database.rb
 lib/timetrackr/period.rb
 test/helper.rb
 test/test_timetrackr.rb
-timetrackr.gemspec
